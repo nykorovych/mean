@@ -1,6 +1,7 @@
 import { Post } from './post.model';
 import {Subject} from 'rxjs';
-import { HttpClient} from '@angular/common/http'
+import { HttpClient} from '@angular/common/http';
+import { map } from 'rxjs/operators';
 
 import { Injectable } from '@angular/core';
 
@@ -13,24 +14,46 @@ export class PostsService {
     constructor (private http: HttpClient) {}
 
     getPosts() {
-        this.http.get<{message: string, posts: Post[]}>('http://localhost:3000/api/posts').subscribe((postData) => {
-            this.posts = postData.posts;
-            this.postsUpdated.next ([...this.posts])
+        this.http.get<{message: string, posts: any}>('http://localhost:3000/api/posts')
+            .pipe(map((postData) => {
+                return postData.posts.map( post => {
+                    return {
+                        title: post.title,
+                        content: post.content,
+                        id: post._id
+                    };
+                });
+            }))
+            .subscribe((convertedPost) => {
+            this.posts = convertedPost;
+            this.postsUpdated.next ([...this.posts]);
         });
 
     }
+
     getPostUpdateListener () {
         return this.postsUpdated.asObservable();
     }
 
     addPost (title: string, content: string) {
         const post: Post = {id: null, title: title, content: content};
-        this.http.post<{message: string}>('http://localhost:3000/api/posts', post).subscribe((responseData)=> {
-            console.log(responseData.message);
+        this.http.post<{id: string}>('http://localhost:3000/api/posts', post).subscribe((responseData)=> {
+            post.id = responseData.id
+            console.log(responseData.id);
             this.posts.push(post);
             this.postsUpdated.next([...this.posts]);
         });
        
   
     }
+    deletePost(postId:string) {
+        this.http.delete('http://localhost:3000/api/posts/' + postId)
+            .subscribe(() => {
+                const postsAfterDelete = this.posts.filter( post => post.id !== postId)
+                this.posts = postsAfterDelete
+                this.postsUpdated.next ([...this.posts])
+                console.log (postsAfterDelete)
+            })
+    }
+
 }   
