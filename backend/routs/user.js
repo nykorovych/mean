@@ -12,7 +12,6 @@ router.post('/signup', (req, res, next) => {
             email:req.body.email,
             password: hash
         });
-        console.log(user)
         user
             .save()
             .then(result => {
@@ -52,7 +51,8 @@ router.post('/login', (req,res, next) => {
             {expiresIn: '1h'}
         );
         res.status(200).json({
-            token:token
+            token:token,
+            expiresIn: 360
         });
         
     })
