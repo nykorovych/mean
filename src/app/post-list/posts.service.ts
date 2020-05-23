@@ -16,7 +16,6 @@ export class PostsService {
 
     getPosts(pageSize: number, currentPage: number) {
         const queryParams = `?pagesize=${pageSize}&currentpage=${currentPage}`; 
-        console.log(queryParams)
         this.http.get<{message: string, posts: any, maxPosts: number}>('http://localhost:3000/api/posts'+ queryParams)
             .pipe(
                 map((postData) => {
@@ -56,7 +55,6 @@ export class PostsService {
             
             this.router.navigate (['/']);
 
-            console.log(responseData)
         });
        
   

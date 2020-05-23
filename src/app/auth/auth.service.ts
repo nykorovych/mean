@@ -44,19 +44,55 @@ export class AuthService {
                this.token = token;
                if (token) {
                 const expiresInDuretion = response.expiresIn;
-                this.tokenTimer = setTimeout(() =>{ this.logout()}, expiresInDuretion *1000 )
+                this.setAuthTimer(expiresInDuretion);
                 this.isAuthenticated = true
                 this.authStatusListener.next(true)
-
+                const now = new Date();
+                const expirationDate = new Date(now.getTime() + expiresInDuretion * 10000)
+                this.saveAuthData(token, expirationDate);
                 this.router.navigate(['/'])
                }
             })
     }
+    autoAuthUser(){
+        const authInformation = this.getAuthDate();
+        const now = new Date();
+        const expiresIn = authInformation.expirationDate.getTime() - now.getTime();
+        if (expiresIn >= 0) {
+            this.token = authInformation.token;
+            this.isAuthenticated = true;
+            this.setAuthTimer(expiresIn / 1000);
+            this.authStatusListener.next(true);
+        }
+    }
+    
     logout(){
         this.token = null;
         this.isAuthenticated = false;
         this.authStatusListener.next(false);
+        this.clearAuthData()
         this.router.navigate(['/'])
         clearTimeout(this.tokenTimer)
     }
+    private setAuthTimer(duration: number){
+        this.tokenTimer = setTimeout(() => { this.logout()}, duration *1000 );
+    }
+    saveAuthData( token: string, expirationDate: Date){
+        localStorage.setItem('token', token);
+        localStorage.setItem('expiration', expirationDate.toISOString() )
+    }
+    clearAuthData() {
+        localStorage.removeItem('token');
+        localStorage.removeItem('expiration')
+    }
+    getAuthDate(){
+        const token = localStorage.getItem('token');
+        const expirationDate = localStorage.getItem('expiration');
+        if (!token || !expirationDate) {
+            return
+        }
+        return { token: token, expirationDate: new Date(expirationDate)}
+
+    }
+
 }
