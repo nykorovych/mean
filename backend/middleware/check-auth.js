@@ -7,7 +7,7 @@ module.exports = (req, res, next) => {
         req.usr = { email: decodedToken.email, userId: decodedToken.userId}
         next();
     } catch (error) {
-       return res.send(401).json({ message: "auth failed!" });
+       return res.status(401).json({ message: "You are not authenticated from Middleware" });
     }
     
 };

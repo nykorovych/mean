@@ -28,9 +28,11 @@ export class PostListComponent implements OnInit, OnDestroy {
   constructor(public postsService:PostsService, private authService: AuthService ) { }
 
   onDelete(postId) {
-    this.isLoading = false;
+    this.isLoading = true;
     this.postsService.deletePost(postId).subscribe( () =>{
       this.postsService.getPosts(this.postsPerPage, this.currentPage)
+    }, () => {
+      this.isLoading =false
     });
   }
   onChangedPage(pageData:PageEvent){

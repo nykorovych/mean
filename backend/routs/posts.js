@@ -47,6 +47,11 @@ router.post('', checkAuth, multer({
         id: result._id
       }
     })
+    .catch(error => {
+      res.status(500).json({
+        message: 'creating a post failed!'
+      })
+    })
   });
 
 
@@ -82,6 +87,12 @@ router.put('/:id', checkAuth, multer({
     }
 
   })
+  .catch(error => {
+    res.status(500).json({
+      message: "Post wasnt updated Pepeg"
+    })
+  
+  })
 
 })
 router.get('/:id', (req, res, next) => {
@@ -93,6 +104,11 @@ router.get('/:id', (req, res, next) => {
         message: 'Post not found'
       })
     }
+  })
+  .catch(error => {
+    res.status(500).json({
+      message: "No fetchy fetchi"
+    })
   })
 })
 router.get('', (req, res, next) => {
@@ -118,6 +134,11 @@ router.get('', (req, res, next) => {
 
 
   })
+  .catch(error => {
+    res.status(500).json({
+      message: "No fetchy fetchi"
+    })
+  })
 
 });
 
@@ -134,7 +155,11 @@ router.delete('/:id', checkAuth, (req, res, next) => {
         message: 'Cant delete Pepeg'
       })
     }
-  });
+  }).catch(error => {
+    res.status(500).json({
+      message: "No delete fetchy fetchi"
+    });
+  })
   
 })
 
